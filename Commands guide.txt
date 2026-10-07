@@ -1,0 +1,16 @@
+Normal Run in Same PC:
+
+	1.  cd Documents\VirtualTour 2
+	2.  py -3.11 app.py
+	3. open browser and paste this link : http://localhost:5000
+
+Run using virtual server :
+	
+	1. Frist Open CMD and run : cd Documents\VirtuTour
+	2. py -3.11 app.py
+	3. open new CMD and run : cd Documents\VirtuTour
+	4. .\ngrok http 5000
+	5. open this link : https://revenge-expend-degreases.ngrok-free.dev
+
+
+if user give not answer continue video segments according to the order we give.

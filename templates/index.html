@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Virtual_Tour</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    <header>
+        <div class="logo">🌐 Virtual_<span>Tour</span></div>
+        <nav aria-label="Main navigation">
+            <a href="/" class="glass-btn glass-btn-sm">Explore</a>
+            <a href="#" class="glass-btn glass-btn-sm">Popular</a>
+            <a href="#" class="glass-btn glass-btn-sm">About</a>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <h1>Explore Sri Lanka in VR</h1>
+        <p class="subtitle">Immersive 360° tours of Sri Lanka's most breathtaking destinations</p>
+
+        <div class="grid">
+            {% for slug, dest in destinations.items() %}
+            <a href="/destination/{{ slug }}" class="card">
+                 <img src="{{ dest.image }}" alt="{{ dest.name }}" loading="lazy" width="400" height="220">
+                <div class="hover-play">&#9654;</div>
+                <div class="badge">{{ dest.duration }}</div>
+                <div class="card-body">
+                    <h3>{{ dest.name }}</h3>
+                    <p>{{ dest.location }}</p>
+                </div>
+            </a>
+            {% endfor %}
+
+            {% for p in placeholders %}
+            <div class="card disabled">
+                <img src="{{ p.image }}" alt="{{ p.name }}" loading="lazy" width="400" height="220">
+                <div class="badge">{{ p.duration }}</div>
+                <div class="card-body">
+                    <h3>{{ p.name }}</h3>
+                    <p>Coming soon</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer>© 2026 Virtual_Tour. Explore responsibly.</footer>
+</body>
+</html>

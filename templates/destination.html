@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ dest.name }} - Virtual_Tour</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <style>
+        /* ---- Order builder UI ---- */
+        .order-builder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin: 14px 0 10px;
+            padding: 0 10px;
+        }
+        .order-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+        }
+        .order-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 30px;
+            padding: 10px 22px;
+            color: #e2e2e8;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            backdrop-filter: blur(4px);
+            flex: 1 0 auto;
+            min-width: 100px;
+        }
+        .order-btn:hover {
+            background: rgba(20,184,166,0.2);
+            border-color: #14b8a6;
+            transform: translateY(-2px);
+        }
+        .order-btn:active {
+            transform: scale(0.97);
+        }
+        .order-btn .letter {
+            color: #14b8a6;
+            font-weight: 700;
+            margin-right: 6px;
+        }
+        .order-btn.picked {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: none;
+            border-color: rgba(255,255,255,0.05);
+            text-decoration: line-through;
+        }
+        .order-btn.picked .letter {
+            color: #849495;
+        }
+        .order-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            min-height: 32px;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            border: 1px dashed rgba(255,255,255,0.1);
+            width: 100%;
+            max-width: 600px;
+            color: #e2e2e8;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        .order-list .step {
+            background: rgba(20,184,166,0.15);
+            border: 1px solid rgba(20,184,166,0.3);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 13px;
+            color: #5eead4;
+        }
+        .order-list .step .num {
+            color: #14b8a6;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+        .order-hint {
+            text-align: center;
+            color: #849495;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        .order-hint .highlight {
+            color: #14b8a6;
+        }
+        .start-tour-btn {
+            background: #14b8a6;
+            color: #0A0C10;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            margin-top: 4px;
+        }
+        .start-tour-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(20,184,166,0.3);
+        }
+        .start-tour-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: none;
+        }
+        .reset-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 8px 18px;
+            color: #a3a3a3;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .reset-btn:hover {
+            border-color: #14b8a6;
+            color: #e2e2e8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Virtual_<span>Tour</span></div>
+        <nav>
+            <a href="/" class="glass-btn glass-btn-sm">Explore</a>
+            <a href="#" class="glass-btn glass-btn-sm">Popular</a>
+            <a href="#" class="glass-btn glass-btn-sm">About</a>
+        </nav>
+    </header>
+
+    <main>
+        <a href="/" class="back-link">&larr; Back to Destinations</a>
+
+        <div class="video-wrapper">
+            <!-- Play overlay (intro) -->
+            <div class="play-overlay" id="playOverlay" onclick="startIntro()">
+                <div class="play-circle">▶</div>
+                <div>Click to start from intro</div>
+            </div>
+
+            <!-- A-Frame scene -->
+            <a-scene embedded
+                     vr-mode-ui="enabled: false"
+                     renderer="antialias: true; colorManagement: true; highRefreshRate: true"
+                     loading-screen="dotsColor: #00dbe7; backgroundColor: #0A0C10">
+                <a-assets>
+                    <video id="video360" playsinline webkit-playsinline preload="auto" src="{{ dest.intro_video or dest.video }}"></video>
+                </a-assets>
+                <a-videosphere rotation="0 -90 0" src="#video360"></a-videosphere>
+            </a-scene>
+
+            <!-- Player bar -->
+            <div class="player-bar">
+                <button id="pauseBtn" class="mini-btn" onclick="togglePause()">⏸</button>
+                <div class="now-viewing">
+                    <div class="now-viewing-label">NOW VIEWING</div>
+                    <div class="now-viewing-name" id="nowViewingName">{{ dest.name }}, 360°</div>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <button class="mini-btn" onclick="toggleFullscreen()">⛶</button>
+                <button class="mini-btn vr-btn" id="vrBtn" onclick="toggleVR()">🥽</button>
+            </div>
+        </div>
+
+        <!-- ===== ORDER BUILDER ===== -->
+        <div class="order-builder">
+            <div class="order-grid" id="orderGrid"></div>
+            <div class="order-list" id="orderList">Tap locations below to build your tour order</div>
+            <div class="order-hint">
+                <span id="orderHint">Choose <span class="highlight">4 locations</span> in the order you want to watch</span>
+            </div>
+            <div>
+                <button class="start-tour-btn" id="startTourBtn" disabled onclick="startCustomTour()">▶ Start Tour</button>
+                <button class="reset-btn" onclick="resetOrder()">↺ Reset</button>
+            </div>
+        </div>
+
+        <h2 class="dest-title">{{ dest.name }}</h2>
+        <p class="dest-location">{{ dest.location }}</p>
+
+        <!-- Save/Share, facts, info cards... -->
+        <div class="action-row">
+            <button class="glass-btn glass-btn-icon" id="saveBtn" onclick="toggleSave('{{ slug }}')">
+                <span id="heartIcon">♥</span>
+            </button>
+            <button class="glass-btn glass-btn-sm" onclick="shareDestination('{{ dest.name }}', window.location.href)">
+                🔗 Share
+            </button>
+        </div>
+        <div class="toast" id="toast"></div>
+
+        <div class="quick-facts">
+            <div class="fact-card"><div class="fact-icon">⏱</div><div class="fact-label">Duration</div><div class="fact-value">{{ dest.duration }}</div></div>
+            <div class="fact-card"><div class="fact-icon">🌡</div><div class="fact-label">Temperature</div><div class="fact-value">{{ dest.temperature }}</div></div>
+            <div class="fact-card"><div class="fact-icon">📍</div><div class="fact-label">Location</div><div class="fact-value">{{ dest.region }}</div></div>
+            <div class="fact-card"><div class="fact-icon">🏛</div><div class="fact-label">Type</div><div class="fact-value">{{ dest.type }}</div></div>
+            <div class="fact-card"><div class="fact-icon">🎫</div><div class="fact-label">Entry</div><div class="fact-value">{{ dest.entry_fee }}</div></div>
+        </div>
+
+        <div class="info-grid">
+            <div>
+                <div class="info-box" onclick="this.classList.toggle('collapsed')">
+                    <h4>About <span class="chevron">▼</span></h4>
+                    <div class="content"><p>{{ dest.about }}</p></div>
+                </div>
+                <div class="info-box" onclick="this.classList.toggle('collapsed')">
+                    <h4>History <span class="chevron">▼</span></h4>
+                    <div class="content"><p>{{ dest.history }}</p></div>
+                </div>
+            </div>
+            <div>
+                <div class="info-box" onclick="this.classList.toggle('collapsed')">
+                    <h4>Weather <span class="chevron">▼</span></h4>
+                    <div class="content"><p>{{ dest.weather }}</p></div>
+                </div>
+                <div class="info-box" onclick="this.classList.toggle('collapsed')">
+                    <h4>Visitor Info <span class="chevron">▼</span></h4>
+                    <div class="content"><p>{{ dest.tips }}</p></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>© 2026 Virtual_Tour. Explore responsibly.</footer>
+
+    <script>
+        // ================================================================
+        // 1. DATA: All available locations
+        // ================================================================
+        const allLocations = [
+            { id: 0, name: "Independence Square", video: "/static/independence_square_compressed.mp4" },
+            { id: 1, name: "Planetarium",        video: "/static/planetarium_compressed.mp4" },
+            { id: 2, name: "Viharamahadevi Park",video: "/static/viharamahadevi_park_compressed.mp4" },
+            { id: 3, name: "Port City",          video: "/static/port_city_compressed.mp4" }
+        ];
+
+        let customOrder = [];
+        let tourStarted = false;
+
+        const vid = document.getElementById('video360');
+        const nowViewing = document.getElementById('nowViewingName');
+        const orderGrid = document.getElementById('orderGrid');
+        const orderList = document.getElementById('orderList');
+        const orderHint = document.getElementById('orderHint');
+        const startBtn = document.getElementById('startTourBtn');
+
+        // ================================================================
+        // 2. Build the choice buttons
+        // ================================================================
+        function buildOrderButtons() {
+            orderGrid.innerHTML = '';
+            allLocations.forEach((loc, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'order-btn';
+                const letter = String.fromCharCode(65 + index);
+                btn.innerHTML = `<span class="letter">${letter}</span> ${loc.name}`;
+                btn.dataset.id = loc.id;
+                if (customOrder.some(item => item.id === loc.id)) {
+                    btn.classList.add('picked');
+                }
+                btn.onclick = () => pickLocation(loc.id);
+                orderGrid.appendChild(btn);
+            });
+        }
+
+        // ================================================================
+        // 3. Pick a location (add to custom order)
+        // ================================================================
+        function pickLocation(id) {
+            if (tourStarted) return;
+            if (customOrder.some(item => item.id === id)) return;
+            if (customOrder.length >= allLocations.length) return;
+
+            const loc = allLocations.find(l => l.id === id);
+            if (!loc) return;
+
+            customOrder.push(loc);
+            updateUI();
+        }
+
+        // ================================================================
+        // 4. Update UI after picking
+        // ================================================================
+        function updateUI() {
+            document.querySelectorAll('.order-btn').forEach(btn => {
+                const id = parseInt(btn.dataset.id);
+                if (customOrder.some(item => item.id === id)) {
+                    btn.classList.add('picked');
+                } else {
+                    btn.classList.remove('picked');
+                }
+            });
+
+            if (customOrder.length === 0) {
+                orderList.innerHTML = 'Tap locations below to build your tour order';
+            } else {
+                orderList.innerHTML = customOrder.map((loc, i) =>
+                    `<span class="step"><span class="num">${i+1}.</span> ${loc.name}</span>`
+                ).join(' ');
+            }
+
+            const remaining = allLocations.length - customOrder.length;
+            if (remaining === 0) {
+                orderHint.innerHTML = '✅ All 4 locations selected! Click <span class="highlight">Start Tour</span>';
+                startBtn.disabled = false;
+            } else {
+                orderHint.innerHTML = `Choose <span class="highlight">${remaining} more</span> location${remaining > 1 ? 's' : ''}`;
+                startBtn.disabled = true;
+            }
+        }
+
+        // ================================================================
+        // 5. Reset order
+        // ================================================================
+        function resetOrder() {
+            if (tourStarted) return;
+            customOrder = [];
+            startBtn.disabled = true;
+            updateUI();
+        }
+
+        // ================================================================
+        // 6. Start custom tour — plays intro FIRST, then user order
+        // ================================================================
+        function startCustomTour() {
+            if (tourStarted) return;
+            if (customOrder.length < allLocations.length) return;
+
+            tourStarted = true;
+            startBtn.disabled = true;
+            document.querySelectorAll('.order-btn').forEach(b => b.disabled = true);
+
+            // Hide overlay if visible
+            const overlay = document.getElementById('playOverlay');
+            overlay.style.display = 'none';
+
+            orderHint.innerHTML = '▶ Playing intro...';
+            orderList.innerHTML = customOrder.map((loc, i) =>
+                `<span class="step"><span class="num">${i+1}.</span> ${loc.name}</span>`
+            ).join(' ');
+
+            // Play intro first
+            vid.muted = false;
+            vid.src = '{{ dest.intro_video or dest.video }}';
+            vid.load();
+
+            const playIntro = () => {
+                vid.play().then(() => {
+                    nowViewing.innerText = 'Intro, 360°';
+                    vid.ontimeupdate = updateProgress;
+                    vid.onended = () => {
+                        // Intro done → start custom order
+                        playCustomSegment(0);
+                    };
+                }).catch(err => {
+                    console.error('Intro error:', err);
+                    orderHint.innerHTML = '⚠️ Error playing intro. Try again.';
+                    tourStarted = false;
+                    startBtn.disabled = false;
+                    document.querySelectorAll('.order-btn').forEach(b => b.disabled = false);
+                });
+            };
+
+            if (vid.readyState >= 3) {
+                playIntro();
+            } else {
+                vid.addEventListener('canplaythrough', function onReady() {
+                    vid.removeEventListener('canplaythrough', onReady);
+                    playIntro();
+                });
+                setTimeout(() => {
+                    if (vid.paused && vid.readyState > 0) {
+                        console.log('Fallback: forcing intro play');
+                        playIntro();
+                    }
+                }, 5000);
+            }
+        }
+
+        // ================================================================
+        // 7. Play custom segment by index
+        // ================================================================
+        function playCustomSegment(index) {
+            if (index >= customOrder.length) {
+                nowViewing.innerText = '🎉 Tour complete!';
+                document.getElementById('progressFill').style.width = '100%';
+                orderHint.innerHTML = '🎉 All done!';
+                return;
+            }
+
+            const seg = customOrder[index];
+            nowViewing.innerText = seg.name + ', 360°';
+
+            vid.src = seg.video;
+            vid.muted = false;
+            vid.load();
+            vid.play().catch(err => console.error('Play error:', err));
+
+            vid.ontimeupdate = updateProgress;
+            vid.onended = () => {
+                playCustomSegment(index + 1);
+            };
+        }
+
+        // ================================================================
+        // 8. Intro (via play overlay)
+        // ================================================================
+        function startIntro() {
+            if (tourStarted) return;
+            tourStarted = true;
+
+            document.querySelectorAll('.order-btn').forEach(b => b.disabled = true);
+            startBtn.disabled = true;
+            orderHint.innerHTML = '▶ Playing intro...';
+
+            const overlay = document.getElementById('playOverlay');
+            overlay.innerHTML = '<div class="play-circle">⏳</div><div>Loading...</div>';
+            overlay.style.display = 'flex';
+
+            vid.muted = false;
+            vid.src = '{{ dest.intro_video or dest.video }}';
+            vid.load();
+
+            const playIt = () => {
+                vid.play().then(() => {
+                    overlay.style.display = 'none';
+                    nowViewing.innerText = 'Intro, 360°';
+                    vid.ontimeupdate = updateProgress;
+                    vid.onended = () => {
+                        // After intro, play user's custom order (if any) or fallback to default order
+                        if (customOrder.length === allLocations.length) {
+                            playCustomSegment(0);
+                        } else {
+                            // Fallback: play default order
+                            customOrder = [...allLocations];
+                            playCustomSegment(0);
+                        }
+                    };
+                }).catch(err => {
+                    console.error('Intro error:', err);
+                    overlay.innerHTML = '<div class="play-circle">⚠️</div><div>Error. Click to retry.</div>';
+                    overlay.style.display = 'flex';
+                    overlay.onclick = startIntro;
+                });
+            };
+
+            if (vid.readyState >= 3) {
+                playIt();
+            } else {
+                vid.addEventListener('canplaythrough', function onReady() {
+                    vid.removeEventListener('canplaythrough', onReady);
+                    playIt();
+                });
+                setTimeout(() => {
+                    if (vid.paused && vid.readyState > 0) {
+                        console.log('Fallback: forcing intro play');
+                        playIt();
+                    }
+                }, 5000);
+            }
+        }
+
+        // ================================================================
+        // 9. Progress bar
+        // ================================================================
+        function updateProgress() {
+            if (vid.duration && isFinite(vid.duration)) {
+                const pct = (vid.currentTime / vid.duration) * 100;
+                document.getElementById('progressFill').style.width = pct + '%';
+            }
+        }
+
+        // ================================================================
+        // 10. Pause / Resume
+        // ================================================================
+        function togglePause() {
+            const btn = document.getElementById('pauseBtn');
+            if (vid.paused) {
+                vid.play();
+                btn.innerHTML = '⏸';
+            } else {
+                vid.pause();
+                btn.innerHTML = '▶';
+            }
+        }
+
+        // ================================================================
+        // 11. Fullscreen
+        // ================================================================
+        function toggleFullscreen() {
+            const wrapper = document.querySelector('.video-wrapper');
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+            if (!isFull) {
+                (wrapper.requestFullscreen || wrapper.webkitRequestFullscreen).call(wrapper);
+            } else {
+                (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+            }
+        }
+
+        // ================================================================
+        // 12. VR mode (split-screen)
+        // ================================================================
+        let vrActive = false;
+        const sceneEl = document.querySelector('a-scene');
+
+        function toggleVR() {
+            if (!sceneEl) return;
+            if (vrActive) {
+                sceneEl.exitVR();
+                vrActive = false;
+                document.getElementById('vrBtn').textContent = '🥽';
+            } else {
+                sceneEl.enterVR();
+                vrActive = true;
+                document.getElementById('vrBtn').textContent = '⏹';
+            }
+        }
+
+        sceneEl.addEventListener('exit-vr', () => {
+            vrActive = false;
+            document.getElementById('vrBtn').textContent = '🥽';
+        });
+        sceneEl.addEventListener('enter-vr', () => {
+            vrActive = true;
+            document.getElementById('vrBtn').textContent = '⏹';
+        });
+
+        document.addEventListener('fullscreenchange', () => { if (sceneEl && sceneEl.resize) sceneEl.resize(); });
+        document.addEventListener('webkitfullscreenchange', () => { if (sceneEl && sceneEl.resize) sceneEl.resize(); });
+
+        // ================================================================
+        // 13. Save / Share
+        // ================================================================
+        function toggleSave(id) {
+            let saved = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            const heart = document.getElementById('heartIcon');
+            if (saved.includes(id)) {
+                saved = saved.filter(s => s !== id);
+                heart.innerHTML = '♥';
+                document.getElementById('saveBtn').classList.remove('saved');
+                showToast('Removed from wishlist');
+            } else {
+                saved.push(id);
+                heart.innerHTML = '❤️';
+                document.getElementById('saveBtn').classList.add('saved');
+                showToast('Saved to wishlist!');
+            }
+            localStorage.setItem('wishlist', JSON.stringify(saved));
+        }
+
+        function shareDestination(title, url) {
+            if (navigator.share) {
+                navigator.share({ title, url }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('Link copied!');
+                }).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = url;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    showToast('Link copied!');
+                });
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ================================================================
+        // 14. On load
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            buildOrderButtons();
+            updateUI();
+
+            const saved = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            if (saved.includes('{{ slug }}')) {
+                document.getElementById('heartIcon').innerHTML = '❤️';
+                document.getElementById('saveBtn').classList.add('saved');
+            }
+        });
+    </script>
+</body>
+</html>

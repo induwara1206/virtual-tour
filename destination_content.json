@@ -1,0 +1,32 @@
+{
+  "colombo": {
+    "about": "Colombo Port City is a futuristic, master-planned financial and lifestyle hub reclaimed from the Indian Ocean. It features modern architecture, upscale promenades, and upcoming luxury resorts right next to Sri Lanka's bustling capital.",
+    "history": "Construction began in 2014 as a joint venture between the Sri Lankan government and China Harbor Engineering Company to transform the coastline. It represents a bold step into the future, symbolizing modern economic ambition and cosmopolitan culture.",
+    "weather": "The climate is tropical and warm year-round, with temperatures typically hovering between 25°C and 30°C. Expect high humidity and occasional tropical downpours, particularly during the monsoon seasons.",
+    "tips": "Visit the Port City Marina Promenade in the late afternoon to enjoy cool ocean breezes and stunning sunset views over the Indian Ocean. Wear light, breathable clothing and stay hydrated while exploring the open-air developments."
+  },
+  "galle-fort": {
+    "about": "Galle Fort is a UNESCO World Heritage site located on the southwestern coast of Sri Lanka. This stunning coastal fortification seamlessly blends European architectural styles with South Asian traditions within a vibrant community.",
+    "history": "Originally built by the Portuguese in the 16th century, the fort was extensively fortified by the Dutch in the 17th century. Today, its preserved ramparts enclose charming cobblestone streets, colonial-era villas, museums, and boutique cafes.",
+    "weather": "The region experiences a tropical climate with warm temperatures year-round. The best time to visit is during the dry season from December to March.",
+    "tips": "Wear comfortable walking shoes to explore the historic ramparts and narrow streets on foot. Make sure to stay for the sunset view from the fort walls."
+  },
+  "sigiriya": {
+    "about": "Sigiriya Rock Fortress is an ancient palace and fortress complex rising dramatically from the central plains of Sri Lanka. Designated as a UNESCO World Heritage site, it is world-renowned for its breathtaking summit views, ancient water gardens, and the famous frescoes of celestial maidens.",
+    "history": "Built in the 5th century AD by King Kasyapa, the site served as his royal capital and a heavily fortified stronghold. Following the king's death, the fortress was converted into a Buddhist monastery before eventually being abandoned and rediscovered by British explorers in the 19th century.",
+    "weather": "The region experiences a tropical climate with warm temperatures year-round, typically ranging from 28°C to 33°C. The best time to visit is during the dry season from January to April to avoid monsoon rains.",
+    "tips": "Climb the rock early in the morning to beat the heat and large tour groups, and wear comfortable walking shoes with good grip. Make sure to stay hydrated and protect yourself from the strong sun along the open staircases."
+  },
+  "ella": {
+    "about": "Nestled in Sri Lanka's lush central highlands, Ella is a breathtaking mountain village renowned for its dramatic waterfalls, verdant tea plantations, and stunning panoramic views. It serves as a paradise for nature lovers and hikers seeking scenic trails like Ella Rock and Little Adam's Peak.",
+    "history": "Originally a remote and sleepy agricultural settlement, Ella gained prominence during the British colonial era when the surrounding hills were cleared for vast tea estates. Today, it has blossomed into a vibrant cultural hub that blends traditional Sri Lankan hill-country heritage with a welcoming backpacker atmosphere.",
+    "weather": "Ella enjoys a pleasant, cooler climate year-round compared to the coastal lowlands, though rain can occur unexpectedly at any time. Mornings are typically crisp and clear, making them ideal for outdoor exploration before afternoon mists roll in.",
+    "tips": "Book your train tickets well in advance, as the iconic journey to Ella is considered one of the most scenic rail rides in the world. Pack sturdy walking shoes for the steep trails and a light jacket for cooler evening temperatures."
+  },
+  "kandy-lake": {
+    "about": "Kandy Lake is a picturesque artificial body of water located in the heart of Kandy, Sri Lanka, framed by rolling green hills. Also known as Kiri Muhuda or the Sea of Milk, it offers peaceful walking paths and stunning reflections of the city.",
+    "history": "Built in 1807 by the last king of Sri Lanka, Sri Wickrama Rajasinghe, the lake holds significant cultural and spiritual importance. It is situated adjacent to the sacred Temple of the Tooth Relic, making it a central landmark in Sri Lankan heritage.",
+    "weather": "Kandy features a tropical rainforest climate with warm temperatures year-round and cooler evenings. Rain showers can occur at any time, though the heaviest rainfall typically happens during the monsoon seasons.",
+    "tips": "Take a leisurely stroll along the perimeter walkway in the early morning or late afternoon to avoid the midday heat. Be mindful of the local wildlife, including monkeys and various bird species, and dress modestly when visiting the nearby temple."
+  }
+}
